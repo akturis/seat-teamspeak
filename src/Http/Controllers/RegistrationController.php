@@ -78,9 +78,9 @@ class RegistrationController extends Controller
      */
     public function handleProviderCallback(Request $request)
     {
-        // determine the expected nickname for that user
-        $searched_nickname = session('seat-connector.teamspeak.registration_uuid');
-
+        // get uid from form
+        $searched_nickname = $request->uid;
+        
         try {
             // retrieve the teamspeak client instance
             $client = TeamspeakClient::getInstance();
