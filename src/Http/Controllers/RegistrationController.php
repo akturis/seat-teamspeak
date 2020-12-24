@@ -20,7 +20,7 @@
 
 namespace Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers;
 
-use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Seat\Web\Http\Controllers\Controller;
 use Warlof\Seat\Connector\Drivers\IClient;
 use Warlof\Seat\Connector\Drivers\IUser;
@@ -57,9 +57,6 @@ class RegistrationController extends Controller
             if (! property_exists($settings, 'server_port') || is_null($settings->server_port))
                 throw new DriverSettingsException('Parameter server_port is missing.');
 
-            $registration_nickname = Str::random(30);
-
-            session(['seat-connector.teamspeak.registration_uuid' => $registration_nickname]);
         } catch (DriverSettingsException $e) {
             event(new EventLogger('teamspeak', 'critical', 'registration', $e->getMessage()));
             logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
@@ -72,14 +69,14 @@ class RegistrationController extends Controller
         $identities = User::where('user_id', auth()->user()->id)->get();
 
         return view('seat-connector-teamspeak::registrations.confirm',
-            compact('drivers', 'identities', 'settings', 'registration_nickname'));
+            compact('drivers', 'identities', 'settings'));
     }
 
     /**
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Seat\Services\Exceptions\SettingException
      */
-    public function handleProviderCallback()
+    public function handleProviderCallback(Request $request)
     {
         // determine the expected nickname for that user
         $searched_nickname = session('seat-connector.teamspeak.registration_uuid');
@@ -103,6 +100,8 @@ class RegistrationController extends Controller
             return redirect()->route('seat-connector.identities')
                 ->with('error', $e->getMessage());
         }
+
+        $client->changeDescription($match_user->getClientId(),auth()->user()->name);
 
         $original_user = User::where('connector_type', 'teamspeak')->where('user_id', auth()->user()->id)->first();
 
