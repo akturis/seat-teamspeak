@@ -31,7 +31,7 @@
           <div class="form-group">
             <label class="col-sm-3 control-label" for="ts-nickname">Nickname</label>
             <div class="col-sm-9">
-              <input type="text" value="{{ $registration_nickname }}" readonly="readonly" id="ts-nickname" class="form-control input-sm" />
+              <input type="text" value="" id="ts-nickname" name="uid" class="form-control input-sm" />
             </div>
           </div>
         </form>
