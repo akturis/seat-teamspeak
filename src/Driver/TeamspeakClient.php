@@ -281,7 +281,21 @@ class TeamspeakClient implements IClient
 
         return $speaker;
     }
-
+    
+    /**
+     * @param int $id
+     * @param string $nickname
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
+     */
+    public function changeDescription(int $id, string $nickname)
+    {
+        $response = $this->sendCall('GET', '/{instance}/clientdbedit', [
+            'cldbid' => $id,
+            'client_description' => $nickname,
+            'instance' => $this->instance_id,
+        ]);                       
+    }
+    
     /**
      * @param string $id
      * @return \Warlof\Seat\Connector\Drivers\ISet|null
